@@ -1,6 +1,7 @@
 require('dotenv').config();
 require('express-async-errors');
 
+
 // extra security packages
 const helmet = require('helmet');
 const cors = require('cors');
@@ -29,7 +30,11 @@ app.use(
 );
 app.use(express.json());
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
+
+}));
 app.use(xss());
 
 // routes

@@ -30,7 +30,17 @@ const getAllComment = async (req, res) => {
          })
 }
 
+const getSingleComment = async (req, res) => {
+  // 1 is descending, -1 is ascending
+  const {
+    user: { userId },
+    params: { id: commentId },
+  } = req
 
+  const comment = await Comment.findById(commentId)
+      
+  res.status(StatusCodes.OK).json({ comment })
+}
 const createComment = async (req, res) => {
     req.body.userId = req.user.userId
     const comment = await Comment.create(req.body)
@@ -39,22 +49,22 @@ const createComment = async (req, res) => {
 
 const updateComment = async (req, res) => {
     const {
-        body: { comment },
+        body: { comment: comments },
         user: { userId },
         params: { id: commentId },
       } = req
-      if (!comment ) {
+      if (!comments ) {
         throw new BadRequestError('Comment fields cannot be empty')
       }
-      const comments = await Comment.findOneAndUpdate(
+      const comment = await Comment.findOneAndUpdate(
         { _id: commentId,userId: userId },
         req.body,
         { new: true, runValidators: true }
       )
-      if (!comments) {
+      if (!comment) {
         throw new ForbiddenError(`Sorry, you are not allowed to update this comment`)
       }
-      res.status(StatusCodes.OK).json({ comments })
+      res.status(StatusCodes.OK).json({ comment })
 }
 
 const deleteComment = async (req, res) => {
@@ -74,7 +84,6 @@ const deleteComment = async (req, res) => {
 }
 
 const likeComment = async (req, res) => {
-    console.log("updating a like")
     const userId = req.user.userId;
     const commentId = req.body.commentId;
     const dislike = await DisLike.findOne({commentId: commentId,userId: userId })
@@ -89,7 +98,7 @@ const likeComment = async (req, res) => {
       return  res.status(StatusCodes.CREATED).send();
     }
 
-    throw new BadRequestError('You already liked/disliked it')
+    throw new ForbiddenError('You already liked/disliked it')
 
 
 }
@@ -110,7 +119,7 @@ const dislikeComment = async (req, res) => {
       return  res.status(StatusCodes.CREATED).send();
     }
 
-    throw new BadRequestError('You already liked/disliked it')
+    throw new ForbiddenError('You already liked/disliked it')
 }
   
 
@@ -120,6 +129,7 @@ module.exports = {
     updateComment,
     deleteComment,
     likeComment,
-    dislikeComment
+    dislikeComment,
+    getSingleComment
 
 }
