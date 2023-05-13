@@ -37,8 +37,10 @@ app.use(cors({
 }));
 app.use(xss());
 
-// routes
+// Authenticated routes
 app.use('/api/v1/auth', authRouter);
+
+//Only authenticated user can use these routes
 app.use('/api/v1/comments',authenticateUser, commentsRouter);
 
 app.use(notFoundMiddleware);
